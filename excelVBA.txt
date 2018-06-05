@@ -1,0 +1,70 @@
+sub biaohebing()
+'合并一个文件中的多张表格'
+rows("2:65536").clear '删除原有记录
+dim sht as worksheet, xrow as integer, rng as Range
+for each sht in worksheets '遍例工作薄中的所有工作表
+    if sht.name <> activesheet.name then
+	    set rng = range("A65536".End(xlup).offset(1,0) '获取总表中目前最后一行数据的位置
+		xrow = sht.range("a1").currentregion.row.count - 1 '获取此表中除标题以外的行数
+		sht.range("A2").resize(xrow, 7).copy rng '把此表中的数据考到总表最后一行处，7是列数
+	end if
+next
+end sub
+
+
+
+sub wenhebin()
+'合并多个文件，注意所有的文件和总表必须在一个文件夹里'
+dim r as long, c as long
+r = 1 '标题占几行
+c = 8 '标题占几列
+range(cells(r+1, "A"), cells(65536, c)).clearcontents  '清空总表
+application.screenupdating = false
+dim filename as sting, wb as workbook, sht as worksheet, erow as long, fn as string, arr as variant
+filename = dir(thisworkbook.path & "\".xls")
+do while filename <> ""
+    if filename <> thisworkbook.name then '如果文件不是总表
+	    erow = range("a1").currentregion.rows.count +1 '获取总表最后一个数据的下一个空行的位置
+		fn = thisworkbook.path & "\" & filename '找到一个要打开的子表
+		set wb = getobject(fn) '打开子表，把句柄传给wb
+		set sht = wb.worksheet(1) '引用子表的第一张工作表
+		arr = sht.range(sht.cells(r+1, "A"), sht.cells(65536, "B").end(xlup).offset(0,8)) '获取子表第一张表的数据范围
+		cells(erow, "A").resize(ubound(arr, 1), ubound(arr, 2)) = arr '把子表的数据考到总表的对应区域
+		wb.close false  '关闭子表句柄
+	end if
+    filename = dir
+loop
+
+application.screenupdating = true
+end sub
+
+
+
+sub biaochaifen()
+    '把总表中的数据按C列分类拆分,表中列数有7列
+    Dim i As Long, bj As String, rng as Range
+	i = 2
+	bj = Cells(i, "C").Value 'bj记录着C列中对应单元格的值
+	Do While bj <> ""
+	    Set rng = Worksheets(bj).Range("A65536").End(xlup).offset(1, 0) '要先手工按照C列内容建立同名工作表，此句获取对应分表中最后一行数据的下一行位置
+		Cells(i, "A").Resize(1, 7).Copy rng '把总表中的这一行的整个内容考到对应分表中的位置
+		i = i + 1
+		bj = Cells(i, "C").Value
+	Loop
+End sub
+
+
+sub wenchairen()
+    '把工作薄中的每个工作表拆分到不到的文件中
+	Application.Screenupdating = False '关闭屏幕更新
+	Dim folder as string
+	folder = thisWorkBook.Path & "\拆分结果"
+	if len(dir(folder, vbdirectory)) = 0 then MkDir folder '如果文件夹不存在则新建
+	dim sht as worksheet
+	for each sht in worksheets
+	    sht.copy '复制工作表新的工作薄
+		activeWorkBook.SaveAs folder & "\" & sht.Name & ."xls" '保存工作薄并命名好
+		activeWorkbook.close
+	next
+	Application.Screenupdating = True
+End sub
