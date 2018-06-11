@@ -4,9 +4,9 @@ rows("2:65536").clear '删除原有记录
 dim sht as worksheet, xrow as integer, rng as Range
 for each sht in worksheets '遍例工作薄中的所有工作表
     if sht.name <> activesheet.name then
-	    set rng = range("A65536".End(xlup).offset(1,0) '获取总表中目前最后一行数据的位置
-		xrow = sht.range("a1").currentregion.row.count - 1 '获取此表中除标题以外的行数
-		sht.range("A2").resize(xrow, 7).copy rng '把此表中的数据考到总表最后一行处，7是列数
+	set rng = range("A65536".End(xlup).offset(1,0) '获取总表中目前最后一行数据的位置
+	xrow = sht.range("a1").currentregion.row.count - 1 '获取此表中除标题以外的行数
+	sht.range("A2").resize(xrow, 7).copy rng '把此表中的数据考到总表最后一行处，7是列数
 	end if
 next
 end sub
