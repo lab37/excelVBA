@@ -68,3 +68,80 @@ sub wenchairen()
 	next
 	Application.Screenupdating = True
 End sub
+
+
+
+
+
+
+sub  HaYaoLiuXiang()
+Dim r As Long, c As Long
+r = 1 '标题占几行
+c = 9 '标题占几列
+Application.ScreenUpdating = False
+Dim filename As String, currentWb As Workbook, currentSht As Worksheet, emptyRow As Long, findNext As String, arr As Variant, gongSiSht As Worksheet, gongSiWb As Workbook, i As Long, j As Long, k As Long
+
+Range(Cells(r + 1, "H"), Cells(1048576, "H")).ClearContents
+Range(Cells(r + 1, "I"), Cells(1048576, "I")).ClearContents
+Range(Cells(r + 1, "J"), Cells(1048576, "J")).ClearContents
+Range(Cells(r + 1, "L"), Cells(1048576, "L")).ClearContents
+Range(Cells(r + 1, "P"), Cells(1048576, "P")).ClearContents
+Range(Cells(r + 1, "Q"), Cells(1048576, "Q")).ClearContents
+Range(Cells(r + 1, "R"), Cells(1048576, "R")).ClearContents
+Range(Cells(r + 1, "S"), Cells(1048576, "S")).ClearContents
+Range(Cells(r + 1, "H"), Cells(1048576, "H")).ClearContents
+Range(Cells(r + 1, "X"), Cells(1048576, "X")).ClearContents
+
+
+Set gongSiWb = GetObject(ThisWorkbook.Path & "\gongsi.xlsx")
+Set gongSiSht = gongSiWb.Worksheets(1) '引用基础表的第一张工作表
+
+filename = Dir(ThisWorkbook.Path & "\*.xlsx")
+k = 2
+
+Do While filename <> ""
+    If filename <> ThisWorkbook.Name And filename <> "gongsi.xlsx" Then  '如果文件不是总表和基础表
+        findNext = ThisWorkbook.Path & "\" & filename '找到一个要打开的子表
+        Set currentWb = GetObject(findNext) '打开子表，把句柄传给currentWb
+        Set currentSht = currentWb.Worksheets(1) '引用子表的第一张工作表
+        For i = 2 To 50  '基础数据表中最多有10行数据
+            If gongSiSht.Cells(i, 1).Value = Left(filename, Len(filename) - 5) Then
+                For j = 1 To 50  '每个表中最多有50列数据，待改善
+                   Select Case currentSht.Cells(1, j).Value
+                        Case gongSiSht.Cells(i, 2).Value
+                            arr = currentSht.Range(currentSht.Cells(r + 1, j), currentSht.Cells(1048576, j).End(xlUp).Offset(1, 0))
+                            Cells(k, "H").Resize(UBound(arr, 1), UBound(arr, 2)) = arr 'ubound中，1最大行,2最大列  把数据复制到总表的16行，位置依赖严重
+                            Cells(k, "X").Resize(UBound(arr, 1), UBound(arr, 2)).Value = Left(filename, Len(filename) - 5)
+                        Case gongSiSht.Cells(i, 3).Value
+                            arr = currentSht.Range(currentSht.Cells(r + 1, j), currentSht.Cells(1048576, j).End(xlUp).Offset(1, 0))
+                            Cells(k, "I").Resize(UBound(arr, 1), UBound(arr, 2)) = arr  'ubound中，1最大行,2最大列
+                        Case gongSiSht.Cells(i, 4).Value
+                            arr = currentSht.Range(currentSht.Cells(r + 1, j), currentSht.Cells(1048576, j).End(xlUp).Offset(1, 0))
+                            Cells(k, "J").Resize(UBound(arr, 1), UBound(arr, 2)) = arr  'ubound中，1最大行,2最大列
+                        Case gongSiSht.Cells(i, 5).Value
+                            arr = currentSht.Range(currentSht.Cells(r + 1, j), currentSht.Cells(1048576, j).End(xlUp).Offset(1, 0))
+                            Cells(k, "P").Resize(UBound(arr, 1), UBound(arr, 2)) = arr  'ubound中，1最大行,2最大列
+                        Case gongSiSht.Cells(i, 6).Value
+                            arr = currentSht.Range(currentSht.Cells(r + 1, j), currentSht.Cells(1048576, j).End(xlUp).Offset(1, 0))
+                            Cells(k, "Q").Resize(UBound(arr, 1), UBound(arr, 2)) = arr  'ubound中，1最大行,2最大列
+                        Case gongSiSht.Cells(i, 7).Value
+                            arr = currentSht.Range(currentSht.Cells(r + 1, j), currentSht.Cells(1048576, j).End(xlUp).Offset(1, 0))
+                            Cells(k, "R").Resize(UBound(arr, 1), UBound(arr, 2)) = arr  'ubound中，1最大行,2最大列
+                        Case gongSiSht.Cells(i, 8).Value
+                            arr = currentSht.Range(currentSht.Cells(r + 1, j), currentSht.Cells(1048576, j).End(xlUp).Offset(1, 0))
+                            Cells(k, "S").Resize(UBound(arr, 1), UBound(arr, 2)) = arr  'ubound中，1最大行,2最大列
+                        Case gongSiSht.Cells(i, 9).Value
+                            arr = currentSht.Range(currentSht.Cells(r + 1, j), currentSht.Cells(1048576, j).End(xlUp).Offset(1, 0))
+                            Cells(k, "L").Resize(UBound(arr, 1), UBound(arr, 2)) = arr  'ubound中，1最大行,2最大列
+                    End Select
+                Next j
+            End If
+        Next i
+        currentWb.Close False  '关闭子表句柄
+        arr = Range(Cells(1, 6), Cells(1048576, 6).End(xlUp).Offset(1, 0))
+        k = UBound(arr, 1) + 1
+    End If
+    filename = Dir
+Loop
+Application.ScreenUpdating = True
+End sub
