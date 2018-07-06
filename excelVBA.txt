@@ -138,7 +138,7 @@ Do While filename <> ""
             End If
         Next i
         currentWb.Close False  '关闭子表句柄
-        arr = Range(Cells(1, 6), Cells(1048576, 6).End(xlUp).Offset(1, 0))
+        arr = Range(Cells(1, 8), Cells(1048576, 8).End(xlUp).Offset(1, 0))
         k = UBound(arr, 1) + 1
     End If
     filename = Dir
