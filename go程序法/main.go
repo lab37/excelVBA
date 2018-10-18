@@ -6,13 +6,23 @@ import (
     "path/filepath"
     "github.com/360EntSecGroup-Skylar/excelize"
 	"strconv"
+	"strings"
 )
 
+func basename(s string) string {
+	slash := strings.LastIndex(s, "\\") // -1 if "/" not found
+	s = s[slash+1:]
+	if dot := strings.LastIndex(s, "."); dot >= 0 {
+		s = s[:dot]
+	}
+	return s
+}
 
 func main() {
     matchXlsx, _ := excelize.OpenFile("./match.xlsx")
 	matchRows := matchXlsx.GetRows("Sheet1")
 	fmt.Println("已登记商业公司个数：",len(matchRows)-1)
+	fmt.Println("   ")
 	count:=1  //记录当行已汇总的行数
 	icount := 0  //计数导入了几列
 	tmpCount :=0  //计数以判断是否在match表中有对应商业
@@ -21,7 +31,7 @@ func main() {
     filesName, _ := filepath.Glob("./xlsx/*.xlsx")
 	
 	for i:=0;i<len(filesName);i++ {
-	fmt.Println("正在处理文件：   ",filesName[i])
+	fmt.Println("正在处理文件：         ",basename(filesName[i]) + ".xlsx")
 		xlsx, err := excelize.OpenFile(filesName[i])
 		if err != nil {
 			fmt.Println("打开文件错误",filesName[i],err)
@@ -39,8 +49,8 @@ func main() {
 		
 		
 		for m:=1;m<len(matchRows);m++ {
-			if filesName[i]==("xlsx\\" + matchRows[m][0] + ".xlsx") {
-			    fmt.Println("正在导入数据表：   ",dataSheet)
+			if basename(filesName[i])==matchRows[m][0] {
+			    fmt.Println("正在导入数据表：       ",dataSheet)
 				for ry:=0;ry<rya;ry++ {
 					 switch rows[0][ry] {
 						   case matchRows[m][1]:
@@ -78,7 +88,7 @@ func main() {
 				}
 				icount =1
 				count=count + rxa-1
-		        fmt.Println("从此表中导入数据",rxa-1,"行")
+		        fmt.Println("从此表中导入数据:      ",rxa-1,"行")
 				fmt.Println("处理完成")
 				fmt.Println("  ")
 				break
