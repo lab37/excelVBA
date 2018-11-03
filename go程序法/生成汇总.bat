@@ -1,3 +1,0 @@
-@cls
-@go.exe
-@pause
