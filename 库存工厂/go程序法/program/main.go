@@ -20,7 +20,7 @@ func basename(s string) string {
 }
 
 func main() {
-	matchXlsx, _ := excelize.OpenFile("../match.xlsx")
+	matchXlsx, _ := excelize.OpenFile("./match.xlsx")
 	matchRows := matchXlsx.GetRows("Sheet1")
 	fmt.Println("已登记商业公司个数：", len(matchRows)-1)
 	fmt.Println("   ")
@@ -29,7 +29,7 @@ func main() {
 	tmpCount := 0 //计数以判断是否在match表中有对应商业
 	collectFile := excelize.NewFile()
 
-	filesName, _ := filepath.Glob("../xlsx/*.xlsx")
+	filesName, _ := filepath.Glob("./xlsx/*.xlsx")
 
 	for i := 0; i < len(filesName); i++ {
 		fmt.Println("正在处理文件：         ", basename(filesName[i])+".xlsx")
@@ -109,7 +109,7 @@ func main() {
 	// fmt.Println(collectFile.GetRows("Sheet1"))
 	fmt.Println("所有文件处理完成，总共处理文件", len(filesName), "个，汇总数据", count-1, "行")
 
-	collectFile.SaveAs("../汇总.xlsx")
+	collectFile.SaveAs("./汇总.xlsx")
 
 }
 

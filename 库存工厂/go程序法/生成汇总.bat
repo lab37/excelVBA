@@ -1,3 +1,3 @@
 @cls
-@go.exe
+@program\go.exe
 @pause
