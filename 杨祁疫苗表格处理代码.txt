@@ -1,0 +1,23 @@
+Sub 宏1()
+'
+' 宏1 宏
+'
+
+'
+Dim dataCount As Integer
+Dim i, j, k As Integer
+Dim str As String
+
+dataCount = Range("A1").CurrentRegion.Count
+For Each c In Range("A1").CurrentRegion
+str = ""
+    For i = 1 To Len(c.Value)
+        If c.Characters(i, 1).Font.ColorIndex <> 2 Then str = str & c.Characters(i, 1).Text
+    Next
+    c.Value = str
+    c.Font.Name = "宋体"
+    c.Font.ColorIndex = 1
+    c.Font.Size = 9
+
+Next
+End Sub
