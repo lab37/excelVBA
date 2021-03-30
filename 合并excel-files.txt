@@ -1,0 +1,21 @@
+'定义对话框变量
+Dim srcXlsFilesChoose As FileDialog
+Set srcXlsFilesChoose = Application.FileDialog(msoFileDialogFilePicker) '建立选择文件对话框，用于选择要处理的文件
+
+
+If srcXlsFilesChoose.Show = -1 Then  '选择了文件，并点了确定
+    Dim srcXlsFile As Variant
+    Dim i As Integer
+    i = 1
+    For Each srcXlsFile In srcXlsFilesChoose.SelectedItems  '从选择的文件路径列表中依次打开一个文件
+        Dim srcBook As Workbook
+        Set srcBook = Workbooks.Open(srcXlsFile)
+        srcBook.Worksheets(1).Copy Before:=ThisWorkbook.Worksheets(i)  '把源文件的第一个表整体复制到本文件的一个表中
+        ThisWorkbook.Worksheets(i).Name = VBA.Replace(srcBook.Name, ".xlsx", "") '把这个sheet名改成源文件名
+        srcBook.Close SaveChanges:=False
+        i = i + 1
+    Next srcXlsFile
+End If
+
+Set srcXlsFilesChoose = Nothing
+

@@ -1,0 +1,19 @@
+Application.ScreenUpdating = False
+
+For j = 1 To Sheets.Count
+
+If Sheets(j).Name <> ActiveSheet.Name Then
+
+X = Range("A65536").End(xlUp).Row + 1 '找到要粘贴的起始位置
+
+Sheets(j).UsedRange.Copy Cells(X, 1) '把源数据拷到这个位置以后，这是从A列开始的
+
+End If
+
+Next
+
+Range("B1").Select  '结束后光标放在B1单元格上
+
+Application.ScreenUpdating = True
+
+MsgBox "当前工作簿下的全部工作表已经合并完毕！", vbInformation, "提示"

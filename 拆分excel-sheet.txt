@@ -1,0 +1,62 @@
+Dim d As Object, sht As Worksheet, srcArr, dstArr, thisKeyRows, keyNames, i&, j&, k&, x&
+Dim srcArea As Range, keyArea As Range, headRowCount&, keyColumnIndex&, srcColumnCount&, pd&
+Application.ScreenUpdating = False '关闭屏幕更新
+Application.DisplayAlerts = False '关闭警告信息提示
+Set d = CreateObject("scripting.dictionary") 'set字典
+
+Set keyArea = Application.InputBox("请框选拆分依据列！随便点一个这列的单元格就行！", Title:="提示", Type:=8)
+
+'用户选择的拆分依据列
+keyColumnIndex = keyArea.Column '取拆分关键字所在列标
+
+'用户设置总表的标题行数
+headRowCount = Val(Application.InputBox("请输入总表标题行的行数？"))
+If headRowCount = 0 Then MsgBox "你未输入标题行行数，程序退出。": Exit Sub
+
+Set srcArea = ActiveSheet.UsedRange '总表的数据区域
+srcArr = srcArea '总表的数据范围装入数组srcArr
+keyColumnIndex = keyColumnIndex - srcArea.Column + 1 '计算关键字列在数组中的位置，数组计数是从0开始的，不同于表格
+srcColumnCount = UBound(srcArr, 2) '计算数据源的列数
+
+For i = headRowCount + 1 To UBound(srcArr) '遍历数组srcArr，生成一个字典，记录每个关键字对应的行号
+    If Not d.exists(srcArr(i, keyColumnIndex)) Then
+        d(srcArr(i, keyColumnIndex)) = i '创建字典，字典对应这个关键词的行号
+    Else
+        d(srcArr(i, keyColumnIndex)) = d(srcArr(i, keyColumnIndex)) & "," & i '如果字典中已经存在此键字则把行号合并进来，以逗号间隔
+    End If
+Next
+
+For Each sht In Worksheets '遍历一遍工作表，如果存在字典中的重名表则删除
+    If d.exists(sht.Name) Then sht.Delete
+Next
+
+keyNames = d.keys '字典的key集，也就是关键字去重后的样子
+For i = 0 To UBound(keyNames) '遍历字典key值，ubound相当于取了关键字的个数
+    If keyNames(i) <> "" Then '如果key不为空
+        thisKeyRows = Split(d(keyNames(i)), ",") '取出item里储存的行号，也就是这个关键字在哪此行出现
+        ReDim dstArr(1 To UBound(thisKeyRows) + 1, 1 To srcColumnCount) '声明放置结果的数组dstArr大小
+        k = 0
+        For x = 0 To UBound(thisKeyRows)
+            k = k + 1 '累加记录行数
+            For j = 1 To srcColumnCount '循环读取列
+                dstArr(k, j) = srcArr(thisKeyRows(x), j)
+            Next
+        Next
+        With Worksheets.Add(, Sheets(Sheets.Count))
+            '新建一个工作表，位置在所有已存在sheet的后面
+            .Name = keyNames(i) '表格命名
+            .[a1].Resize(headRowCount, srcColumnCount) = srcArr '放标题行
+            .[a1].Offset(headRowCount, 0).Resize(k, srcColumnCount) = dstArr '放置数据区域
+            srcArea.Copy '复制粘贴总表的格式
+            .[a1].PasteSpecial Paste:=xlPasteFormats, Operation:=xlNone, SkipBlanks:=False, Transpose:=False
+            .[a1].Select
+        End With
+        Columns("A:A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete  '删除因为格式复制而带来的空行格式
+    End If
+Next
+Sheets(1).Activate '激活第一个表格
+Set d = Nothing '释放字典
+Erase srcArr: Erase dstArr '释放数组
+MsgBox "数据拆分完成！"
+Application.ScreenUpdating = True '恢复屏幕更新
+Application.DisplayAlerts = True '恢复警示
